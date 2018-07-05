@@ -1,8 +1,8 @@
 {
   "uuid" : "70a9f288-3c01-4745-a04b-5641e82d6c69",
-  "version" : "1.5.3",
+  "version" : "2.4.0.20500",
   "name" : "ssb",
-  "owner" : "ADMIN",
+  "owner" : null,
   "cost" : 50,
   "status" : "DISABLED",
   "segments" : [],

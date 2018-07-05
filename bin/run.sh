@@ -4,12 +4,22 @@ ssb_home=$dir/../ssb-benchmark
 
 # configurations
 LOCAL_TMP_DIR=/tmp
-HDFS_BASE_DIR=/user/root/ssb/
+HDFS_BASE_DIR=/user/kylin_manager_user/ssb
 PARALLEL_TASKS=10
 
+KYLIN_INSTALL_USER=kylin_manager_user
+KYLIN_INSTALL_USER_KEYTAB=/home/kylin_manager_user/keytab/kylin_manager_user.keytab
+
+# use beeline to access hive
+HIVE_BEELINE_COMMAND="beeline -u jdbc:hive2://iphost:10000 -n kylin_manager_user -p kylin_manager_user -d org.apache.hive.jdbc.HiveDriver"
+
 partition=false
-database=SSB
+database=ssb
 scale=0.1
+
+# before running again, delete exist tables and views
+tables="customer lineorder part supplier dates"
+views="p_lineorder"
 
 while [[ $# -ge 1 ]]
 do
@@ -87,9 +97,24 @@ for c in $(seq $PARALLEL_TASKS);do
 done
 
 # clean up hive metadata
-hive -e "DROP DATABASE IF EXISTS ${database} CASCADE;"
+#hive -e "DROP DATABASE IF EXISTS ${database} CASCADE;"
+# Hive+Sentry
+# delete tables in database
+for table in ${tables}
+do
+    ${HIVE_BEELINE_COMMAND} -e "DROP TABLE IF EXISTS ${database}.${table};"
+done
+
+# delete views in database
+for view in ${views}
+do
+    ${HIVE_BEELINE_COMMAND} -e "DROP view IF EXISTS ${database}.${view};"
+done
+
 
 # clean up previous data if available
+# kinit
+kinit -kt ${KYLIN_INSTALL_USER_KEYTAB} ${KYLIN_INSTALL_USER}
 hadoop fs -rm -r $HDFS_BASE_DIR
 hadoop fs -mkdir -p $HDFS_BASE_DIR
 hadoop fs -mkdir -p $HDFS_BASE_DIR/tmp
@@ -118,13 +143,13 @@ echo "Creating Hive External Tables"
 ls $dir/../hive/* | xargs -I {} cp {} {}.tmp
 sed -i -e "s/<DATABASE>/${database}/g" $dir/../hive/*.tmp
 sed -i -e "s|<hdfs-dir>|${HDFS_BASE_DIR}|g" $dir/../hive/*.tmp
-hive -f $dir/../hive/1_create_basic.sql.tmp
+${HIVE_BEELINE_COMMAND} -f $dir/../hive/1_create_basic.sql.tmp
 if [ "${partition}" == "true" ]
 then
     echo "Creating Hive Partitioned Table, may cost some time..."
-    hive -f $dir/../hive/2_create_partitions.sql.tmp
+    ${HIVE_BEELINE_COMMAND} -f $dir/../hive/2_create_partitions.sql.tmp
 else
     echo "Creating Hive View"
-    hive -f $dir/../hive/2_create_views.sql.tmp
+    ${HIVE_BEELINE_COMMAND} -f $dir/../hive/2_create_views.sql.tmp
 fi
 rm $dir/../hive/*.tmp
