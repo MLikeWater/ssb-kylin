@@ -10,9 +10,10 @@ PARALLEL_TASKS=10
 KYLIN_INSTALL_USER=kylin_manager_user
 KYLIN_INSTALL_USER_PASSWD=xxxxxxxx
 KYLIN_INSTALL_USER_KEYTAB=/home/${KYLIN_INSTALL_USER}/keytab/${KYLIN_INSTALL_USER}.keytab
+BEELINE_URL=jdbc:hive2://hiveserve2_ip:10000
 
 # use beeline to access hive, user:kylin_manager_user password: xxxxxxxx
-HIVE_BEELINE_COMMAND="beeline -u jdbc:hive2://hiveserve2_ip:10000 -n ${KYLIN_INSTALL_USER} -p ${KYLIN_INSTALL_USER_PASSWD} -d org.apache.hive.jdbc.HiveDriver"
+HIVE_BEELINE_COMMAND="beeline -u ${BEELINE_URL} -n ${KYLIN_INSTALL_USER} -p ${KYLIN_INSTALL_USER_PASSWD} -d org.apache.hive.jdbc.HiveDriver"
 
 partition=false
 database=ssb
