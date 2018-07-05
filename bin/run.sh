@@ -10,6 +10,8 @@ PARALLEL_TASKS=10
 KYLIN_INSTALL_USER=kylin_manager_user
 KYLIN_INSTALL_USER_PASSWD=xxxxxxxx
 KYLIN_INSTALL_USER_KEYTAB=/home/${KYLIN_INSTALL_USER}/keytab/${KYLIN_INSTALL_USER}.keytab
+
+# update "hiveserve2_ip:10000" variable to actual hiveserver2 address
 BEELINE_URL=jdbc:hive2://hiveserve2_ip:10000
 
 # use beeline to access hive, user:kylin_manager_user password: xxxxxxxx
