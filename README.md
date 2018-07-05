@@ -52,10 +52,10 @@ The data generation executes in YARN, please increase YARN container memory if y
 
 3. Generate Data and Import into Hive
 
-   Make sure `/user/root` has permission
+   Make sure `/user/kylin_manager_user` has permission
 
    ``` shell
-   hdfs dfs -chmod -R 777 /user/root
+   hdfs dfs -chmod -R 777 /user/kylin_manager_user
    ```
    
    Generate the data and load into Hive tables.
@@ -74,7 +74,7 @@ The data generation executes in YARN, please increase YARN container memory if y
 4. Make sure that data has already be created
 
    ```shell
-   hive
+   beeline -u jdbc:hive2://hiveserve2_ip:10000 -n kylin_manager_user -p kylin_manager_user -d org.apache.hive.jdbc.HiveDriver
    use ssb;
    show tables;
    select count(*) from p_lineorder;
